@@ -77,8 +77,12 @@ class Hero:
             print(f'{self.name} is at {self.current_health} health. {opponent.name} is at {opponent.current_health} health.\n')
         if opponent.is_alive():
             print(f'Opponent {opponent.name} is victorious')
+            self.add_death(1)
+            opponent.add_kill(1)
         else:
             print(f'Hero {self.name} is victorious')
+            self.add_kill(1)
+            opponent.add_death(1)
     
     def add_kill(self, num_kills):
         self.kills += num_kills
@@ -105,11 +109,27 @@ class Team:
     def add_hero(self, hero):
         self.heroes.append(hero)
 
+    def is_alive(self):
+        for hero in self.heroes:
+            if hero.is_alive() == True:
+                return True
+        return False
+
     def attack(self, other_team):
-        attacker = self.heroes[random.randint(0, len(self.heroes - 1))]
-        defender = other_team.heroes[random.randint(0, len(other_team.heroes - 1))]
-        attacker.fight(defender)
-    
+        turn = 0 # controls who is attacking
+        while self.is_alive() and other_team.is_alive():
+            turn += 1
+            attacker = self.heroes[random.randint(0, len(self.heroes) - 1)]
+            defender = other_team.heroes[random.randint(0, len(other_team.heroes) - 1)]
+            if (turn / 2) == 0:
+                attacker.fight(defender)
+            else:
+                defender.fight(attacker)
+        if self.is_alive:
+            print(f'{self.name} wins!')
+        else:
+            print(f'{other_team.name} wins!')
+
     def revive_heroes(self):
         for hero in self.heroes:
             hero.current_health = hero.starting_health
