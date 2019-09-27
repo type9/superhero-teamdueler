@@ -1,6 +1,6 @@
 import random
 
-DEBUG = True # var for enabling console logs for debugging
+DEBUG = False # var for enabling console logs for debugging
 
 class Ability:
     def __init__(self, name, attack_strength):
@@ -49,7 +49,10 @@ class Hero:
         for armor in range(len(self.armors)):
             block_amount =+ self.armors[armor].block()
         return block_amount
-    
+
+    def add_weapon(self, weapon):
+        self.abilities.append(weapon)
+
     def take_damage(self, damage):
         attack_amount = damage - self.defend()
         if attack_amount < 0: # stops from adding health if block amount is larger than attack amount
@@ -138,3 +141,70 @@ class Team:
         for hero in self.heroes:
             kdr = hero.kills / hero.deaths
             print(f'{hero.name}: {kdr} KDR')
+
+class Arena:
+    def __init__(self):
+        team_one = None
+        team_two = None
+    
+    def create_ability(self):
+        name = input('Input a name for the ability: ')
+        max_damage = input('Input the max damage the ability can deal: ')
+        new_ability = Ability(name, max_damage)
+        return new_ability
+    
+    def create_weapon(self):
+        name = input('Input a name for the weapon: ')
+        max_damage = input('Input the max damage that weapon can deal: ')
+        new_weapon = Weapon(name, max_damage)
+        return new_weapon
+
+    def create_armor(self):
+        name = input('Input a name for the armor: ')
+        max_block = input('Input the max damage that armor can mitigate: ')
+        new_armor = Armor(name, max_block)
+        return new_armor
+
+    def create_hero(self):
+        name = input('Input a hero name: ')
+        max_health = input('Input the max_health for that hero: ')
+        new_hero = Hero(name, max_health)
+        still_adding = True
+        while still_adding:
+            print('If you would like to add an ability input 1, for weapon input 2, and for armor input 3.')
+            user_input = input('Type anything else to skip: ')
+            if user_input == '1':
+                new_hero.add_ability(self.create_ability())
+            elif user_input == '2':
+                new_hero.add_weapon(self.create_weapon())
+            elif user_input == '3':
+                new_hero.add_weapon(self.create_armor())
+            else:
+                still_adding = False
+        return new_hero
+    
+    def build_team_one(self):
+        name = input('Input a name for Team 1: ')
+        new_team = Team(name)
+        still_adding = True
+        while still_adding:
+            print('If you would like to add a character input 1')
+            user_input = input('Otherwise type anything else: ')
+            if user_input == '1':
+                new_team.add_hero(self.create_hero())
+            else:
+                still_adding = False
+        self.team_one = new_team
+    
+    def build_team_two(self):
+        name = input('Input a name for Team 2: ')
+        new_team = Team(name)
+        still_adding = True
+        while still_adding:
+            print('If you would like to add a character input 1')
+            user_input = input('Otherwise type anything else: ')
+            if user_input == '1':
+                new_team.add_hero(self.create_hero())
+            else:
+                still_adding = False
+        self.team_two = new_team
