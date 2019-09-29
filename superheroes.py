@@ -129,9 +129,9 @@ class Team:
             else:
                 defender.fight(attacker)
         if self.is_alive:
-            print(f'{self.name} wins!')
+            return 1 # returns number of winning team
         else:
-            print(f'{other_team.name} wins!')
+            return 2
 
     def revive_heroes(self):
         for hero in self.heroes:
@@ -142,33 +142,51 @@ class Team:
             kdr = hero.kills / hero.deaths
             print(f'{hero.name}: {kdr} KDR')
 
+    def get_avg_kdr(self):
+        total_kills = 0
+        total_deaths = 0
+        for hero in self.heroes:
+            total_kills += hero.kills
+            total_deaths += hero.deaths
+        if total_deaths == 0: # checks for division by 0
+            return total_kills # returns just kills instead
+        else:
+            return total_kills/total_deaths
+    def print_team_status(self):
+        for hero in self.heroes:
+            if hero.is_alive():
+                print(f'[ALIVE] {hero.name}')
+            else:
+                print(f'[DEAD] {hero.name}')
+
 class Arena:
     def __init__(self):
         team_one = None
         team_two = None
-    
+        last_winner = 0 # should be 1 or 2
+        
     def create_ability(self):
         name = input('Input a name for the ability: ')
         max_damage = input('Input the max damage the ability can deal: ')
-        new_ability = Ability(name, max_damage)
+        new_ability = Ability(name, int(max_damage))
         return new_ability
     
     def create_weapon(self):
         name = input('Input a name for the weapon: ')
         max_damage = input('Input the max damage that weapon can deal: ')
-        new_weapon = Weapon(name, max_damage)
+        new_weapon = Weapon(name, int(max_damage))
         return new_weapon
 
     def create_armor(self):
         name = input('Input a name for the armor: ')
         max_block = input('Input the max damage that armor can mitigate: ')
-        new_armor = Armor(name, max_block)
+        new_armor = Armor(name, int(max_block))
         return new_armor
 
     def create_hero(self):
         name = input('Input a hero name: ')
         max_health = input('Input the max_health for that hero: ')
-        new_hero = Hero(name, max_health)
+        new_hero = Hero(name, int(max_health))
         still_adding = True
         while still_adding:
             print('If you would like to add an ability input 1, for weapon input 2, and for armor input 3.')
@@ -178,7 +196,7 @@ class Arena:
             elif user_input == '2':
                 new_hero.add_weapon(self.create_weapon())
             elif user_input == '3':
-                new_hero.add_weapon(self.create_armor())
+                new_hero.add_armor(self.create_armor())
             else:
                 still_adding = False
         return new_hero
@@ -208,3 +226,25 @@ class Arena:
             else:
                 still_adding = False
         self.team_two = new_team
+    
+    def team_battle(self):
+        self.last_winner = self.team_one.attack(self.team_two)
+
+    def show_stats(self):
+        if self.last_winner == 1: # checks the winner of the last run team battle
+            print(f'{self.team_one.name} won!')
+        else:
+            print(f'{self.team_one.name} won!')
+        print(f'========= {self.team_one.name} Stats =========')
+        print(f'Average KDR: {self.team_one.get_avg_kdr()}')
+        self.team_one.print_team_status()
+        print(f'========= {self.team_two.name} Stats =========')
+        print(f'Average KDR: {self.team_two.get_avg_kdr()}')
+        self.team_two.print_team_status()
+
+if __name__ == "__main__":
+    arena = Arena()
+    arena.build_team_one()
+    arena.build_team_two()
+    arena.team_battle()
+    arena.show_stats()
